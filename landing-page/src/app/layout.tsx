@@ -1,9 +1,10 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "Landing Page",
-  description: "My awesome landing page",
+  title: "Ramen House",
+  description: "Najlepszy ramen w mieście - autentyczna japońska kuchnia",
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

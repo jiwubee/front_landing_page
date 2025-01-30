@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 interface MenuItem {
   name: string;
@@ -12,6 +13,7 @@ const Header: React.FC = () => {
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const headerRef = useRef<HTMLElement>(null);
+  const { language, setLanguage, t } = useLanguage();
 
   const handleScroll = useCallback(() => {
     const currentScrollPosition = window.scrollY;
@@ -70,10 +72,11 @@ const Header: React.FC = () => {
   }, [isMenuOpen]);
 
   const menuItems: MenuItem[] = [
-    { name: "O nas", href: "#about" },
-    { name: "Menu", href: "#menu" },
-    { name: "Rezerwacje", href: "#reservations" },
-    { name: "Kontakt", href: "#contact" },
+    { name: t("nav.about"), href: "#about" },
+    { name: t("nav.menu"), href: "#menu" },
+    { name: t("nav.gallery"), href: "#gallery" },
+    { name: t("nav.reservations"), href: "#reservations" },
+    { name: t("nav.contact"), href: "#contact" },
   ];
 
   const handleLinkClick = useCallback(
@@ -101,12 +104,12 @@ const Header: React.FC = () => {
             <div className="flex items-center">
               <div className="text-2xl font-bold text-white">Ramen House</div>
               <div className="hidden md:block ml-4 text-sm text-gray-300">
-                Najlepszy ramen w mieście
+                {t("header.slogan")}
               </div>
             </div>
 
             {/* Menu na desktop */}
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex items-center space-x-8">
               {menuItems.map((item) => (
                 <a
                   key={item.name}
@@ -116,28 +119,42 @@ const Header: React.FC = () => {
                   {item.name}
                 </a>
               ))}
+
+              {/* Przełącznik języka */}
+              <button
+                onClick={() => setLanguage(language === "pl" ? "en" : "pl")}
+                className="px-3 py-1 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+                {language.toUpperCase()}
+              </button>
             </nav>
 
             {/* Przycisk menu mobilnego */}
-            <button
-              className="md:hidden p-2 rounded-lg hover:bg-gray-800"
-              onClick={toggleMenu}
-              aria-label={isMenuOpen ? "Zamknij menu" : "Otwórz menu"}>
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                {isMenuOpen ? (
-                  <path d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
+            <div className="md:hidden flex items-center space-x-4">
+              <button
+                onClick={() => setLanguage(language === "pl" ? "en" : "pl")}
+                className="px-3 py-1 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors">
+                {language.toUpperCase()}
+              </button>
+              <button
+                className="p-2 rounded-lg hover:bg-gray-800"
+                onClick={toggleMenu}
+                aria-label={isMenuOpen ? "Zamknij menu" : "Otwórz menu"}>
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  {isMenuOpen ? (
+                    <path d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Menu mobilne */}
