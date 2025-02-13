@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { MenuProvider } from "./contexts/MenuContext";
 
 export const metadata: Metadata = {
   title: "Ramen House",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <MenuProvider>{children}</MenuProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

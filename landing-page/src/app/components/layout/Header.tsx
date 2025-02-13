@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useMenu } from "../../contexts/MenuContext";
 
 interface MenuItem {
   name: string;
@@ -14,13 +15,16 @@ const Header: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const headerRef = useRef<HTMLElement>(null);
   const { language, setLanguage, t } = useLanguage();
+  const { setActiveCategory } = useMenu();
 
   const handleScroll = useCallback(() => {
     const currentScrollPosition = window.scrollY;
+    // Pokazuj header przy scrollowaniu w górę
     if (currentScrollPosition < lastScrollPosition) {
-      setIsVisible(false);
-    } else {
       setIsVisible(true);
+    } else {
+      // Ukrywaj przy scrollowaniu w dół
+      setIsVisible(false);
     }
     setLastScrollPosition(currentScrollPosition);
     setIsScrolled(currentScrollPosition > 50);
@@ -30,20 +34,27 @@ const Header: React.FC = () => {
     setIsMenuOpen((prev) => !prev);
   }, []);
 
-  const scrollToSection = useCallback((href: string) => {
-    const element = document.querySelector(href);
-    if (element && headerRef.current) {
-      const headerHeight = headerRef.current.offsetHeight;
-      const elementPosition =
-        element.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementPosition - headerHeight;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-      setIsMenuOpen(false);
-    }
-  }, []);
+  const scrollToSection = useCallback(
+    (href: string) => {
+      const element = document.querySelector(href);
+      if (element && headerRef.current) {
+        const headerHeight = headerRef.current.offsetHeight;
+        const elementPosition =
+          element.getBoundingClientRect().top + window.scrollY;
+        const offsetPosition = elementPosition - headerHeight;
+        if (href === "#menu") {
+          setActiveCategory("all");
+        }
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+        setIsMenuOpen(false);
+      }
+    },
+    [setActiveCategory]
+  );
 
   const handleEscape = useCallback((event: KeyboardEvent) => {
     if (event.key === "Escape") {
@@ -102,7 +113,15 @@ const Header: React.FC = () => {
           <div className="flex items-center justify-between py-4">
             {/* Logo i hasło */}
             <div className="flex items-center">
-              <div className="text-2xl font-bold text-white">Ramen House</div>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="text-2xl font-bold text-white hover:text-gray-200 transition-colors">
+                Ramen House
+              </a>
               <div className="hidden md:block ml-4 text-sm text-gray-300">
                 {t("header.slogan")}
               </div>
