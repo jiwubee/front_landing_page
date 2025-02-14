@@ -23,6 +23,13 @@ const translations: Translations = {
     "nav.reservations": "Rezerwacje",
     "nav.contact": "Kontakt",
     "header.slogan": "Najlepszy ramen w mieście",
+    "menu.title": "Nasze Menu",
+    "menu.description": "Odkryj naszego autentycznego ramena i przystawki",
+    "menu.loading": "Ładowanie menu...",
+    "menu.error": "Nie udało się załadować menu",
+    "menu.categories.all": "Wszystkie",
+    "menu.categories.ramen": "Ramen",
+    "menu.categories.przystawki": "Przystawki",
   },
   en: {
     "nav.about": "About",
@@ -31,6 +38,13 @@ const translations: Translations = {
     "nav.reservations": "Reservations",
     "nav.contact": "Contact",
     "header.slogan": "Best ramen in town",
+    "menu.title": "Our Menu",
+    "menu.description": "Discover our authentic ramen and appetizers",
+    "menu.loading": "Loading menu...",
+    "menu.error": "Failed to load menu",
+    "menu.categories.all": "All",
+    "menu.categories.ramen": "Ramen",
+    "menu.categories.przystawki": "Appetizers",
   },
 };
 

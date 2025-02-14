@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useMenu } from "../../contexts/MenuContext";
 
@@ -9,6 +10,7 @@ interface MenuItem {
 }
 
 const Header: React.FC = () => {
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
@@ -19,11 +21,9 @@ const Header: React.FC = () => {
 
   const handleScroll = useCallback(() => {
     const currentScrollPosition = window.scrollY;
-    // Pokazuj header przy scrollowaniu w górę
     if (currentScrollPosition < lastScrollPosition) {
       setIsVisible(true);
     } else {
-      // Ukrywaj przy scrollowaniu w dół
       setIsVisible(false);
     }
     setLastScrollPosition(currentScrollPosition);
@@ -36,12 +36,19 @@ const Header: React.FC = () => {
 
   const scrollToSection = useCallback(
     (href: string) => {
+      if (href === "/menu") {
+        router.push(href);
+        setIsMenuOpen(false);
+        return;
+      }
+
       const element = document.querySelector(href);
       if (element && headerRef.current) {
         const headerHeight = headerRef.current.offsetHeight;
         const elementPosition =
           element.getBoundingClientRect().top + window.scrollY;
         const offsetPosition = elementPosition - headerHeight;
+
         if (href === "#menu") {
           setActiveCategory("all");
         }
@@ -53,7 +60,7 @@ const Header: React.FC = () => {
         setIsMenuOpen(false);
       }
     },
-    [setActiveCategory]
+    [setActiveCategory, router, setIsMenuOpen]
   );
 
   const handleEscape = useCallback((event: KeyboardEvent) => {
@@ -84,7 +91,7 @@ const Header: React.FC = () => {
 
   const menuItems: MenuItem[] = [
     { name: t("nav.about"), href: "#about" },
-    { name: t("nav.menu"), href: "#menu" },
+    { name: t("nav.menu"), href: "/menu" },
     { name: t("nav.gallery"), href: "#gallery" },
     { name: t("nav.reservations"), href: "#reservations" },
     { name: t("nav.contact"), href: "#contact" },
@@ -93,9 +100,14 @@ const Header: React.FC = () => {
   const handleLinkClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
       e.preventDefault();
-      scrollToSection(href);
+      if (href.startsWith("#")) {
+        scrollToSection(href);
+      } else {
+        router.push(href);
+        setIsMenuOpen(false);
+      }
     },
-    [scrollToSection]
+    [scrollToSection, router, setIsMenuOpen]
   );
 
   return (
@@ -111,10 +123,10 @@ const Header: React.FC = () => {
         ${isVisible ? "translate-y-0" : "-translate-y-full"}`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
-            {/* Logo i hasło */}
+            {/* Logo and slogan */}
             <div className="flex items-center">
               <a
-                href="#"
+                href="/"
                 onClick={(e) => {
                   e.preventDefault();
                   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -127,7 +139,7 @@ const Header: React.FC = () => {
               </div>
             </div>
 
-            {/* Menu na desktop */}
+            {/* Desktop menu */}
             <nav className="hidden md:flex items-center space-x-8">
               {menuItems.map((item) => (
                 <a
@@ -139,7 +151,7 @@ const Header: React.FC = () => {
                 </a>
               ))}
 
-              {/* Przełącznik języka */}
+              {/* Language switcher */}
               <button
                 onClick={() => setLanguage(language === "pl" ? "en" : "pl")}
                 className="px-3 py-1 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors">
@@ -147,7 +159,7 @@ const Header: React.FC = () => {
               </button>
             </nav>
 
-            {/* Przycisk menu mobilnego */}
+            {/* Mobile menu button */}
             <div className="md:hidden flex items-center space-x-4">
               <button
                 onClick={() => setLanguage(language === "pl" ? "en" : "pl")}
@@ -157,7 +169,7 @@ const Header: React.FC = () => {
               <button
                 className="p-2 rounded-lg hover:bg-gray-800"
                 onClick={toggleMenu}
-                aria-label={isMenuOpen ? "Zamknij menu" : "Otwórz menu"}>
+                aria-label={isMenuOpen ? "Close menu" : "Open menu"}>
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -176,7 +188,7 @@ const Header: React.FC = () => {
             </div>
           </div>
 
-          {/* Menu mobilne */}
+          {/* Mobile menu */}
           {isMenuOpen && (
             <nav className="md:hidden pb-4">
               {menuItems.map((item) => (

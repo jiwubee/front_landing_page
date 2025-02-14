@@ -1,38 +1,43 @@
 "use client";
 import React, { createContext, useContext, useState } from "react";
 
-interface MenuItem {
+// Base type for a menu item from API
+export interface MenuItemBase {
   id: number;
   name: string;
   price: number;
   description: string;
   ingredients: string[];
+}
+
+// Type for our menu items with category
+export interface MenuItem extends MenuItemBase {
   category: string;
 }
 
-interface MenuState {
+// Type for API response
+export interface MenuData {
+  ramen: MenuItemBase[];
+  przystawki: MenuItemBase[];
+}
+
+// Type for our context
+interface MenuContextType {
   menu: MenuItem[];
   activeCategory: string;
   setActiveCategory: (category: string) => void;
   setMenu: (menu: MenuItem[]) => void;
 }
 
-const MenuContext = createContext<MenuState | undefined>(undefined);
+const MenuContext = createContext<MenuContextType | undefined>(undefined);
 
-export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const MenuProvider = ({ children }: { children: React.ReactNode }) => {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
   return (
     <MenuContext.Provider
-      value={{
-        menu,
-        setMenu,
-        activeCategory,
-        setActiveCategory,
-      }}>
+      value={{ menu, setMenu, activeCategory, setActiveCategory }}>
       {children}
     </MenuContext.Provider>
   );

@@ -3,8 +3,9 @@ import React, { useEffect } from "react";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useMenu } from "@/app/contexts/MenuContext";
 import { useMenuData } from "@/app/hooks/useMenuData";
+import type { MenuItem } from "@/app/contexts/MenuContext";
 
-const Menu: React.FC = () => {
+const Menu = () => {
   const { t } = useLanguage();
   const {
     menu: globalMenu,
@@ -16,46 +17,43 @@ const Menu: React.FC = () => {
 
   useEffect(() => {
     if (fetchedMenu) {
-      setMenu(fetchedMenu);
+      // Get entries from the menu object with proper typing
+      const entries = Object.entries(fetchedMenu) as [string, MenuItem[]][];
+
+      // Transform each entry into MenuItems with category
+      const transformedMenu = entries.flatMap(([category, items]) =>
+        items.map(
+          (item): MenuItem => ({
+            ...item,
+            category,
+          })
+        )
+      );
+
+      setMenu(transformedMenu);
     }
   }, [fetchedMenu, setMenu]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white">Ładowanie menu...</div>
+      <div className="min-h-[400px] flex items-center justify-center bg-gray-900">
+        <div className="text-white">{t("menu.loading")}</div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-red-500">
-          Wystąpił błąd podczas ładowania menu. Spróbuj ponownie później.
-        </div>
+      <div className="min-h-[400px] flex items-center justify-center bg-gray-900">
+        <div className="text-red-500">{t("menu.error")}</div>
       </div>
     );
   }
-
-  const categories = [
-    "all",
-    ...new Set(globalMenu.map((item) => item.category)),
-  ];
 
   const filteredMenu =
     activeCategory === "all"
       ? globalMenu
       : globalMenu.filter((item) => item.category === activeCategory);
-
-  const getCategoryName = (category: string): string => {
-    const categoryNames: Record<string, string> = {
-      all: t("menu.categories.all"),
-      ramen: t("menu.categories.ramen"),
-      przystawki: t("menu.categories.appetizers"),
-    };
-    return categoryNames[category] || category;
-  };
 
   return (
     <section id="menu" className="py-20 bg-gray-900">
@@ -69,7 +67,7 @@ const Menu: React.FC = () => {
           </p>
 
           <div className="flex justify-center gap-4 mb-12 flex-wrap">
-            {categories.map((category) => (
+            {["all", "ramen", "przystawki"].map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
@@ -79,7 +77,7 @@ const Menu: React.FC = () => {
                       ? "bg-red-600 text-white"
                       : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                   }`}>
-                {getCategoryName(category)}
+                {t(`menu.categories.${category}`)}
               </button>
             ))}
           </div>

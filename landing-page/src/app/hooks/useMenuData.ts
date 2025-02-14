@@ -1,25 +1,22 @@
 import useSWR from "swr";
+import type { MenuItemBase } from "@/app/contexts/MenuContext";
 
-interface MenuItem {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  ingredients: string[];
-  category: string;
+interface MenuData {
+  ramen: MenuItemBase[];
+  przystawki: MenuItemBase[];
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function useMenuData() {
-  const { data, error, isLoading } = useSWR<MenuItem[]>("/api/menu", fetcher, {
+  const { data, error, isLoading } = useSWR<MenuData>("/api/menu", fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
-    refreshInterval: 300000,
+    refreshInterval: 300000, // 5 minutes
   });
 
   return {
-    menu: data || [],
+    menu: data,
     isLoading,
     isError: error,
   };
